@@ -3,6 +3,7 @@ import {
   Shape,
   ShapeStream,
   ShapeStreamOptions,
+  ShapeData,
 } from '@electric-sql/client'
 import React, { useCallback, useRef } from 'react'
 import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/with-selector.js'
@@ -40,13 +41,16 @@ export function getShapeStream(options: ShapeStreamOptions): ShapeStream {
   }
 }
 
-export function getShape(shapeStream: ShapeStream): Shape {
+export function getShape(
+  shapeStream: ShapeStream,
+  shapeData?: ShapeData
+): Shape {
   // If the stream is already cached, return
   if (shapeCache.has(shapeStream)) {
     // Return the ShapeStream
     return shapeCache.get(shapeStream)!
   } else {
-    const newShape = new Shape(shapeStream)
+    const newShape = new Shape(shapeStream, shapeData)
 
     shapeCache.set(shapeStream, newShape)
 
@@ -95,14 +99,16 @@ const identity = (arg: unknown) => arg
 
 interface UseShapeOptions<Selection> extends ShapeStreamOptions {
   selector?: (value: UseShapeResult) => Selection
+  shapeData?: ShapeData
 }
 
 export function useShape<Selection = UseShapeResult>({
   selector = identity as never,
+  shapeData: data,
   ...options
 }: UseShapeOptions<Selection>): Selection {
   const shapeStream = getShapeStream(options as ShapeStreamOptions)
-  const shape = getShape(shapeStream)
+  const shape = getShape(shapeStream, data)
 
   const latestShapeData = useRef(parseShapeData(shape))
   const getSnapshot = React.useCallback(() => latestShapeData.current, [])

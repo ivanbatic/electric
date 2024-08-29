@@ -446,13 +446,14 @@ export class ShapeStream {
 export class Shape {
   private stream: ShapeStream
 
-  private data: ShapeData = new Map()
+  private data: ShapeData
   private subscribers = new Map<number, ShapeChangedCallback>()
   public error: FetchError | false = false
   private hasNotifiedSubscribersUpToDate: boolean = false
 
-  constructor(stream: ShapeStream) {
+  constructor(stream: ShapeStream, initData?: ShapeData) {
     this.stream = stream
+    this.data = initData ?? new Map()
     this.stream.subscribe(this.process.bind(this), this.handleError.bind(this))
     const unsubscribe = this.stream.subscribeOnceToUpToDate(
       () => {
