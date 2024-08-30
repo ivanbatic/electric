@@ -383,9 +383,16 @@ export class ShapeStream {
     let attempt = 0
 
     // eslint-disable-next-line no-constant-condition -- we're retrying with a lag until we get a non-500 response or the abort signal is triggered
-    while (true) {
+    while (true && (!signal || !signal.aborted)) {
       try {
-        const result = await this.fetchClient(url.toString(), { signal })
+        // The request are being cached and I can't disable it,
+        // so I'm adding a random query parameter to avoid it.
+        // This needs to be fixed, but all stuff I tried didn't work.
+        url.searchParams.set(`_`, Math.random().toString())
+        console.log(`fetching ${url.toString()}`)
+        const result = await this.fetchClient(url.toString(), {
+          signal,
+        } as any)
         if (result.ok) return result
         else throw await FetchError.fromResponse(result, url.toString())
       } catch (e) {
