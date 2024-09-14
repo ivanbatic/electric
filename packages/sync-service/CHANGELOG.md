@@ -1,5 +1,11 @@
 # @core/sync-service
 
+## 0.4.5
+
+### Patch Changes
+
+- 66ee2ae: Add OpenTelemetry spans for HTTP request handling and replication message processing.
+
 ## 0.4.4
 
 ### Patch Changes
